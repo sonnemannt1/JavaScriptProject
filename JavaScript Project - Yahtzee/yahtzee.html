@@ -1,0 +1,491 @@
+
+<!DOCTYPE html>
+<html>
+
+  <head>
+
+	<title>Yahtzee Javascript Application For CSC 443</title>
+
+	  <style type="text/css">
+
+		 a:hover{ 
+		color:#00F;
+		}
+	  </style>
+		<Script>
+		  	var end;
+			totalScore=0;
+			scoreHolders=0;
+			var matches = new Array(6);
+			var Dice = new Array();
+			var hold = new Array(6);			
+			var dicePic = new Array(6);
+			rollValue=0; //initialize roll #
+
+
+			function hold(i)
+			{
+				value = dice[i];
+				hold[i-1] = "hold";
+				document.images['dice' + i].src = ('purpledice' + value + '.gif');
+
+			}
+			
+
+			function clearScoreBoard()
+			{
+
+			  rollValue = 0;
+
+			  for(var i=0 ; i < 6; i++)
+			  {
+				  document.form.column1[i].value = "";
+			  }
+			  for(var j=0 ; j < 7 ; j++)
+			  {
+				  document.form.column2[j].value = "";
+			  }
+			  var sc = 0;
+			  document.form.score.value = "";
+
+			  for (var setBlankDice = 1; setBlankDice < 7 ; setBlankDice++){
+				  document.images['dice' + setBlankDice].src = "dice0.gif";
+			  }
+			}
+			/*
+			  Initil Function
+			  Start the Game
+			  */
+			function initialize() {
+
+			  end = 0;
+			  sc=0;
+			  rollValue=0;
+			  //Sets image locations on screen to the saved dice images
+			  //by going through the HTML table and manually setting image to the blank dice
+			  for (var setBlankDice = 1; setBlankDice < 7 ; setBlankDice++){
+				  document.images['dice' + setBlankDice].src = "dice0.gif";
+			  }
+
+			   totalScore=0;
+
+			   scoreHolders=0;
+			}
+		function roll() {
+
+			rollValue++;
+
+			if (rollValue > 3){
+			  alert("You cannot roll the dice more than 3 times!");
+			  initialize();
+			}
+			else{
+			//Sets the dice array to hold the values for each specific dice
+			dicePic[0]="dice1";
+			dicePic[1]="dice2";
+			dicePic[2]="dice3";
+			dicePic[3]="dice4";
+			dicePic[4]="dice5";
+			dicePic[5]="dice6";
+
+			for (var d = 1; d < 6; d++) {
+				if (hold[d] != "hold")
+				{
+					  //Randomizes the dice # for picture, so it will always grab a random value from 1-6
+					newPicNumber = Math.round(Math.random() * 6) % 6 + 1; //have to add +1 since %6 gives numbers between 0 and 5, when we need 1-6
+					Dice[d] = newPicNumber;
+					document.images['dice' + d].src = dicePic[newPicNumber-1] + ".gif";
+				}
+				else
+				{
+
+				}
+
+			  }
+			}
+		}
+
+		function countingScore(n) {
+
+		  if(end == 0 ) 
+		  {
+
+			var diceTotal=0;
+			if ((n > 0) && (n < 7)) 
+			{
+			  	slotChecker= (document.form.column1[n-1].value);
+			  	if (slotChecker == "")
+			  	{ 
+					scoreHolders++;
+					var sc=0;
+					for (num=1; num<6; num++) 
+					{
+
+				  		if (Dice[num] == n) 
+				  		{
+							sc = sc + n; 
+				  		}
+					}
+
+					totalScore = totalScore + sc;
+					document.form.column1[n-1].value=sc; //Sets slot equal to score from rolls
+					document.form.score.value=totalScore;
+					sc=0;
+					rollValue=0;
+					initialize();
+			  	}
+			}
+
+			if (n > 6) 
+			{
+			  	slotChecker= (document.form.column2[n-7].value);
+
+			  	if (slotChecker == "")
+			  	{
+					scoreHolders++;
+					var sc=0;
+
+					if ((n==7) || (n==8)) 
+					{
+
+						for (num=1; num<7; num++) 
+						{
+							matches[num]=0;
+						}
+					  	h3=0;
+					  	h4=0; 
+
+					for (num = 1; num < 6; num++) 
+					{ 
+						v=Dice[num];
+						diceTotal=diceTotal+v;
+						matches[v]++;                 
+					}
+
+					  for (num =1; num<7 ;num++) 
+					  {
+
+							if ((n==7) && (matches[z] >= 3))   
+							{
+						   		h3=1;
+						   		sc=diceTotal;
+						   		document.form.column2[n-7].value=sc;
+
+						   		totalScore=totalScore+sc;
+
+						   		document.form.score.value=totalScore;
+						   		initialize();
+							}
+							else if ((n==8) && (matches[num] >= 4)) 
+							{
+						   		h4=1;
+						   		sc=diceTotal;
+						   		document.form.column2[n-7].value=sc;
+						   		totalScore=totalScore+sc;
+						   		document.form.score.value=totalScore;
+						   		initialize();
+							}
+					  	}
+					  if ((n==7) && (h3==0)) //If there aren't 3 of a kind
+					  {
+						  document.form.column2[n-7].value="0";
+						  initialize();
+					  }
+					  if ((n==8) && (h4==0))  //If there aren't 4 of a kind
+					  {
+						  document.form.column2[n-7].value="0";
+						  initialize();
+					  }   
+				}
+
+			  	if (n==9) 
+			  	{
+					  h1=0;
+					  h2=0;
+
+					  for (hits=1; hits<7; hits++) 
+					  {
+						  matches[hits]=0;
+					  }
+					  for (num = 1; num < 6; num++) 
+					  { 
+						  v=Dice[num];
+						  matches[v]++;                 
+					  }
+					  for (hits=1; hits<7; hits++) 
+					  {
+						if (matches[hits]==2) 
+						{
+						  	h1=1; 
+						}
+						if (matches[hits]==3) 
+						{
+						  	h2=1; 
+						}
+					  }
+					  if ((h1==1) && (h2==1)) {
+						  sc=25;
+						  document.form.column2[n-7].value=sc;
+						  totalScore=totalScore+sc;
+						  document.form.score.value=totalScore;
+						  rollValue=0;
+						  initialize();
+					  }
+					if ((h1 !==1) || (h2 !==1))
+					{
+						document.form.column2[n-7].value = "0";
+						document.form.score.value = totalScore;
+						initialize();         
+					}
+				}
+
+				if ((n==10) || (n==11))
+				{
+				  	var straightArray = new Array(7);
+				  	//Make straight a string variable, so later we can split it by using slice
+				  	straight = new String("");
+					for (i=1; i<7; i++)
+					{
+					  	straightArray[i]="";
+					}
+					for (i=1; i<6; i++) {
+					 	diceNumber = Dice[i]; //grabs the value of the dice
+					 	straightArray[diceNumber] = diceNumber; //stores it in straight array, to later test for small + large straight
+					 }
+					for (y=1; y<7; y++)
+					{
+						 if (straightArray[y] !== "")
+						 {
+						  	straight=straight+straightArray[y];
+						 }
+					}
+					if (n==10) {
+
+					  	if (straight=="13456") {
+
+					 		straight = "3456"; //Set the small straight value
+					 	}
+					 	if ((straight.slice(0,4)=="1234") || (straight.slice(0,4)=="2345")  || (straight.slice(0,4)=="3456")) 
+					 	{ 
+							sc=30;
+							document.form.column2[n-7].value=sc;
+							totalScore=totalScore+sc;
+							document.form.score.value=totalScore;
+							rollValue=0;
+							initialize();
+					  	}
+						if ((straight.slice(0,4) !=="1234") && (straight.slice(0,4) !=="2345") && (straight.slice(0,4) !=="3456") && (n==10))
+						{
+						  	sc=0;
+							document.form.column2[n-7].value="0";
+							totalScore=totalScore+sc;
+							document.form.score.value=totalScore;
+							rollValue=0;
+							initialize();
+						}
+					}
+
+					if (n==11) {
+						if ((straight == "12345") || (straight =="23456")) 
+						{
+						  	sc=40;
+							document.form.column2[n-7].value=sc;
+							totalScore=totalScore+sc;
+							document.form.score.value=totalScore;
+							rollValue=0;
+							initialize();
+						}
+						if ((straight !== "12345") && (straight !== "23456") && (n==11)) {
+						  	sc=0;
+							document.form.column2[n-7].value="0";
+							totalScore=totalScore+sc;
+							document.form.score.value=totalScore;
+							rollValue=0;
+							initialize();
+						}
+					}
+			}
+
+
+
+				if (n==12) {
+					for (num=1; num<6; num++) 
+					{
+						sc=sc+Dice[num];
+					}
+					document.form.column2[n-7].value=sc;
+					totalScore=totalScore+sc;
+					document.form.score.value=totalScore;
+					sc=0;
+					rollValue=0;
+					initialize();
+				}
+
+
+				if (n==13) {
+
+				  yahtzee=0;
+
+				  for (hits=1; hits<7; hits++) {
+
+					matches[hits]=0;
+
+				  }
+
+				  for (z = 1; z < 6; z++) { 
+
+					 v=Dice[z];
+
+					 matches[v]++;           
+
+				  }
+
+				  for (x=1; x<7; x++) {
+				  //check for yahtzee (all dice have same number)
+					 if (matches[x]==5) {
+
+					  yahtzee=1; 
+					  }
+				   }
+
+				  if (yahtzee==1) {
+					  sc=50;
+					  document.form.column2[n-7].value=sc;
+					  totalScore=totalScore+sc;
+					  document.form.score.value=totalScore;
+					  rollValue=0;
+					  sc=0;
+					  initialize();
+					}
+
+					  if (yahtzee !==1) 
+					  {
+						sc=0;
+						document.form.column2[n-7].value=sc;
+						rollValue=0;
+						sc=0;
+						initialize();
+					  }
+				}
+			}
+		}
+
+
+				if (scoreHolders==13) {
+				 window.alert ("The Final Score is " + totalScore + ".");
+
+				}
+			}
+		}
+		 
+
+</script>
+
+
+<body onload="initialize();" style="width:500px; height:300px; margin:0px; padding:2px;">
+<form name=diceroll>
+<table style="margin-left:30%; margin-top:20%">
+  <tbody>
+  <tr>
+	<td>
+		<a href="javascript:hold(1)">
+			<img height=50px width=50px src="dice0.gif" border="1" name="dice1" onClick="hold(1)"/>
+		</a>
+	</td> 
+	<td>
+		<a href="javascript:hold(2)">
+			<img height=50px width=50px src="dice0.gif" border="1" name="dice2" onClick="hold(2)"/>
+		</a>
+	</td> 
+	<td>
+		<a href="javascript:hold(3)">
+			<img height=50px width=50px src="dice0.gif" border="1" name="dice3" onClick="hold(3)"/>
+		</a>
+		</td> 
+	<td>
+		<a href="javascript:hold(4)">
+			<img height=50px width=50px src="dice0.gif" border="1" name="dice4" onClick="hold(4)"/>
+		</a>
+	</td> 
+	<td>
+		<a href="javascript:hold(5)">
+			<img height=50px width=50px src="dice0.gif" border="1" name="dice5" onClick="hold(5)"/>
+		</a>
+	</td>
+  </tr>
+  </tbody>
+</table>
+</form>
+<form name=form><input type="hidden" size="5"><input type="hidden" size="5" /> 
+
+<table width="300px" style="margin-left:25%;margin-top:5%">
+  <tbody>
+  <tr>
+	<td width=50px>
+	<td onClick ="countingScore(1)" width=100px><a href="javascript:countingScore(1);">1's </a></td>
+	<td width=50px><input size="5" name="column1"/></td> 
+	<td onclick="countingScore(7)" width=100px><a href="javascript:countingScore(7);">3 of a kind </a></td>
+	<td width=50px><input size="5" name="column2" /></td>
+  </tr>
+  <tr>
+	<td width=50px></td>
+	<td onclick="countingScore(2)" width=100px><a href="javascript:countingScore(2);">2's </a></td>
+	<td width=50px><input size=5 name=column1></td> 
+	<td onclick="countingScore(8)" width=100px><a href="javascript:countingScore(8);">4 of a kind </a></td>
+	<td width=50px><input size=5 name=column2></td>
+  </tr>
+  <tr>
+	<td width=50px></td>
+	<td onclick="countingScore(3)" width=100px><a href="javascript:countingScore(3);">3's </a></td>
+	<td width=50px><input size=5 name=column1> </td>
+	<td onclick="countingScore(9)" width=100px><a href="javascript:countingScore(9);">Full House </a></td>
+	<TD width=50px><input size=5 name=column2></td>
+  </tr>
+  <tr>
+	<td width=50px></td>
+	<td onclick="countingScore(4)" width=100px><a href="javascript:countingScore(4);">4's </a></td>
+	<td width=50px><input size=5 name=column1></td>
+	<td onclick="countingScore(10)" width=100px><a href="javascript:countingScore(10);">Small Straight </a></td>
+	<td width=50px><input size=5 name=column2></td>
+  </tr>
+  <tr>
+	<td width=50px></td>
+	<td onclick=countingScore(5) width=100px><a href="javascript:countingScore(5);">5's </a></td>
+	<td width=50px><input size=5 name=column1></td> 
+	<td onclick=countingScore(11) width=100px><a href="javascript:countingScore(11);">Lg. Straight </a></td>
+	<td width=50px><input size=5 name=column2></td>
+  </tr>
+  <tr>
+	<td width=50px></td>
+	<td onclick=countingScore(6) width=100px><a href="javascript:countingScore(6);">6's </a></td>
+	<td width=50px><input size=5 name=column1></td> 
+	<td onclick=countingScore(12) width=100px><a href="javascript:countingScore(12);">Chance</a></td> 
+	<td width=50px><input size=5 name=column2></td>
+  </tr>
+  <tr>
+	<td width=50px></td>
+	<td onclick=countingScore(13) width=100px><a href="javascript:countingScore(13);">Yahtzee</a></td> 
+	<td width=50px><input size=5 name=column2></td>
+  </tr>
+  <tr>
+	<td width=50px></td>
+	<td width=100px>Total</td>
+	<td width=50px><input size=5 name=score></td>
+  </tr>
+  <tr>
+	<td width=50px></td>
+	<td width=100px><input onclick="clearScoreBoard()" type="button" value="Start Over" /></td>
+  </tr>
+  <tr>
+	<td>
+	</td>
+	<td width=50px height=30px><input style="width:40px;" onclick=roll() type=button value="Roll" name="rollValue" />
+	</td> 
+  </tr>
+  </tbody>
+</table>
+
+</form>
+
+</body>
+</html>
